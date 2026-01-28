@@ -1,11 +1,10 @@
 # Front-end Proyecto
 
-Proyecto en React con itegreacion de una API en laravel 
+Proyecto en React con integración a una API desarrollada en Laravel.
 
 ## Instalación
 
-Explica cómo instalar las dependencias o el proyecto:
+1. Instalar dependencias y correr el servidor
 ```bash
 npm install
 npm run dev
-
