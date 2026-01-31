@@ -1,28 +1,36 @@
-const API_URL = "http://127.0.0.1:8000/api/auth/logout";
+import httpClient from "./httpClient";   // Ya trae el token desde el localStorage
 
-const Logout = async (token) => {
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": `Bearer ${token}` // Aquí pasas el token
-            },
-        });
+class AuthService {
+    token = null;   // Almacena el token de autenticación
+    user = null;  // Almacena la información del usuario autenticado
 
-        if (response.ok) {
-            // Limpia el almacenamiento local después de invalidar en el servidor
-            localStorage.removeItem("user_token");
-            return { success: true, message: "Sesión cerrada correctamente" };
-        } else {
-            return { success: false, message: "Error al cerrar sesión en el servidor" };
+    constructor() {
+        if (AuthService.instance) {
+            return AuthService.instance;
         }
-    } catch (error) {
-        console.log("Error en la petición de Logout:", error);
-        console.error("Error en la petición de Logout:", error);
-        return { success: false, error };
-    }
-};
 
-export default Logout;
+        this.token = localStorage.getItem("token");
+        AuthService.instance = this;
+    }
+
+
+    async logout() {
+        try { 
+            await httpClient.post("/auth/logout");  // Logout en el servidor
+        } catch (error) {
+            console.warn("Error cerrando sesión en servidor", error);
+           
+        } finally {
+         
+            this.token = null;
+            this.user = null;
+            localStorage.removeItem("token");
+        }
+    }
+
+    isAuthenticated() {
+        return !!this.token;
+    }
+}
+
+export default new AuthService();

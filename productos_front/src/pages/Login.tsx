@@ -1,39 +1,47 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+ 
+
 import { useState } from "react";
-import Auth from "../Services/Auth";
+import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import authService from "../Services/AutInstance";
+import LoadingButton from "../components/ui/LoadingButton";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "../components/ui/input";
+
+ 
+
 
 export default function Login() {
   const [datos, setDatos] = useState({
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setDatos({
       ...datos,
       [event.target.name]: event.target.value,
     });
   };
 
-  const sentData = async (event) => {
+  const sentData = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("clic");
-    console.log(datos);
+    setIsLoading(true);
     try {
-      const respuesta = await Auth(datos);
-      const { message, token } = respuesta;
-      setDatos({ email: "", password: "" }); // limpiar formulario
-      localStorage.setItem("token", token);
-      console.log(message);
-      //Redireccion
+      await authService.login(datos);
       navigate("/home");
     } catch (err) {
-       alert(err.message || "Error en el inicio de sesión");
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert("Error en el inicio de sesión");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -75,7 +83,9 @@ export default function Login() {
             </div>
 
             {/* Button */}
-            <Button className="w-full">Entrar</Button>
+            <LoadingButton isLoading={isLoading} texto="Iniciando sesión..." className="w-full">
+              Entrar
+            </LoadingButton>
           </form>
         </CardContent>
       </Card>

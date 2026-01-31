@@ -1,24 +1,20 @@
 import { Button } from "@/components/ui/button";
 import Sidebar from "../components/Sidebar";
-import Products from "../components/Products/Products";
-import {getMe} from "../Services/me";
+import Products from "../components/products/Products";
+import { getMe } from "../Services/me";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-
- 
-
 
 export default function Home() {
   const [usuario, setUsuario] = useState(null);
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
 
-    console.log("Token en Home.jsx:", token);
-     
+      console.log("Token en Home.jsx:", token);
+
       try {
         const data = await getMe(token);
         setUsuario(data);
@@ -37,7 +33,7 @@ export default function Home() {
       <Sidebar />
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="ml-48 flex-1 overflow-y-auto p-8">
         <div className="text-3xl font-semibold mb-4">
           {usuario ? <h1>Hola, {usuario.name}</h1> : <p>Cargando...</p>}
         </div>

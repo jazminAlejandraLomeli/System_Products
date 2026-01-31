@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "./../../Services/ProductService";
+import { getProducts } from "../../Services/ProductService";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "../../components/ui/button";
+import { Button } from "../ui/button";
 
 export default function Products() {
   const [data, setData] = useState([]);
@@ -20,26 +20,32 @@ const [meta, setMeta] = useState({
 });  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const response = await getProducts(page, search);
-        setData(response.data || []);
-       
-        setMeta({
-          current_page: response.current_page,
-          last_page: response.last_page,
-          total: response.total,
-        });  
-      } catch (error) {
-        console.error(error);
-      }
-    };
 
-    // Delay para no hacer demasiadas peticiones al escribir
-    const timer = setTimeout(load, 300);
-    return () => clearTimeout(timer);
-  }, [page, search]);
+  // Cargar productos cuando cambie la página o el término de búsqueda
+useEffect(() => {
+  const load = async () => {
+    try {
+      // Obtener productos desde el servicio
+      const response = await getProducts(page, search);
+
+      setData(response.data || []);  // Asegurarse de que sea un array
+
+      // Actualizar metadatos de paginación
+      setMeta({
+        current_page: response.current_page,
+        last_page: response.last_page,
+        total: response.total,
+      });
+      // Manejar caso donde no hay datos
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const timer = setTimeout(load, 300);
+  return () => clearTimeout(timer);
+}, [page, search]);
+
 
   // Si no hay datos y no estamos buscando nada, mostramos mensaje de carga
   if (data.length === 0 && !search) {

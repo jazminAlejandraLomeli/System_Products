@@ -1,29 +1,27 @@
-// src/services/request.js
+import axios from "axios";  //Importacion de axion para las peticiones http
 
-const API_URL = "http://127.0.0.1:8000/api/auth/login"; 
+const API_URL = "http://127.0.0.1:8000/api/auth/login";
+
 const Auth = async (datos) => {
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
+        const response = await axios.post(API_URL, datos, {
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                "Content-Type": "application/json",
+                "Accept": "application/json",
             },
-            body: JSON.stringify(datos)
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw data; // lanza el error para el componente
-        }
-
-        return data; // éxito
+        return response.data; // la respuesta viene --> response.data
     } catch (error) {
         console.error("RequestLogin error:", error);
-        throw error; // importante
+
+         if (error.response) {
+             throw error.response.data;
+        } else {
+            // Error de red o servidor caído
+            throw { message: "Error de conexión con el servidor" };
+        }
     }
 };
-
 
 export default Auth;
