@@ -1,16 +1,17 @@
- 
-
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../Services/AutInstance";
 import LoadingButton from "../components/ui/LoadingButton";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../components/ui/input";
-
- 
-
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 
 export default function Login() {
   const [datos, setDatos] = useState({
@@ -18,6 +19,7 @@ export default function Login() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState({ visible: false, message: "" });
 
   const navigate = useNavigate();
 
@@ -36,9 +38,12 @@ export default function Login() {
       navigate("/home");
     } catch (err) {
       if (err instanceof Error) {
-        alert(err.message);
+        setShowAlert({ visible: true, message: err.message });
       } else {
-        alert("Error en el inicio de sesión");
+        setShowAlert({
+          visible: true,
+          message: "Error en el inicio de sesión",
+        });
       }
     } finally {
       setIsLoading(false);
@@ -51,6 +56,17 @@ export default function Login() {
         <CardHeader>
           <CardTitle className="text-center text-2xl">Iniciar sesión</CardTitle>
         </CardHeader>
+
+        <div
+          className="px-6 mb-3"
+          style={showAlert.visible ? { display: "block" } : { display: "none" }}
+        >
+          <Alert variant="destructive">
+            {/* <InfoIcon /> */}
+            <AlertTitle>Oooops!</AlertTitle>
+            <AlertDescription>{showAlert.message} </AlertDescription>
+          </Alert>
+        </div>
 
         <CardContent>
           <form className="space-y-4" onSubmit={sentData}>
@@ -79,11 +95,16 @@ export default function Login() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
+                maxLength={13}
               />
             </div>
 
             {/* Button */}
-            <LoadingButton isLoading={isLoading} texto="Iniciando sesión..." className="w-full">
+            <LoadingButton
+              isLoading={isLoading}
+              texto="Iniciando sesión..."
+              className="w-full"
+            >
               Entrar
             </LoadingButton>
           </form>
